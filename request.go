@@ -78,6 +78,9 @@ func signedURL(secret string, apiKey string, path string, args map[string]string
 	qry := queryValues(a).Encode()
 	return fmt.Sprintf("%s/%s/?%s", service, path, qry)
 }
+func SignedURL(secret string, apiKey string, path string, args map[string]string) string {
+	return signedURL(secret, apiKey, path, args)
+}
 
 // Returns a URL for invoking a Flickr method with the specified arguments.  If
 // c has its AuthToken field set, the auth token is added to the URL.  Returned

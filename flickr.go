@@ -73,6 +73,10 @@ func getTokenURL(c *Client, frob string) string {
 	return makeURL(c, "flickr.auth.getToken", map[string]string{"frob": frob}, true)
 }
 
+func getFrob(c *Client) string {
+	return makeURL(c, "flickr.auth.getFrob", map[string]string{}, true)
+}
+
 type flickrError struct {
 	Code string `xml:"code,attr"`
 	Msg  string `xml:"msg,attr"`
@@ -100,6 +104,30 @@ func (c *Client) GetToken(frob string) (string, *User, error) {
 		return "", nil, r.Err.Err()
 	}
 	return r.Auth.Token, &r.Auth.User, nil
+}
+
+func (c *Client) GetFrob() string {
+	r := struct {
+		Frob string `xml:"frob"`
+	}{}
+	if err := flickrGet(c, getFrob(c), &r); err != nil {
+		return ""
+	}
+	return r.Frob
+}
+
+func (c *Client) Delete(args map[string]string) (string, error) {
+	r := struct {
+		Stat string      `xml:"stat,attr"`
+		Err  flickrError `xml:"err"`
+	}{}
+
+	u := makeURL(c, "flickr.photos.delete", args, true)
+
+	if err := flickrGet(c, u, &r); err != nil {
+		return "ok", err
+	}
+	return "", nil
 }
 
 // Returns URL for Flickr photo search.
